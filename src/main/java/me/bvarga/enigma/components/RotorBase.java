@@ -1,8 +1,9 @@
 package me.bvarga.enigma.components;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class RotorBase {
+public class RotorBase implements Serializable {
 
     protected Map<Integer, Integer> RotorWiring;
     protected Map<Integer, Integer> RotorWiringReverse;
@@ -50,9 +51,7 @@ public class RotorBase {
     }
 
     public int convertForward(int c) {
-        int retVal = RotorWiring.get(c);
-        AdvanceRotor();
-        return retVal;
+        return RotorWiring.get(c);
     }
 
     public int convertReverse(int c) {
@@ -65,6 +64,8 @@ public class RotorBase {
         int index = 0;
         for(Map.Entry<Integer, Integer> entry : RotorWiring.entrySet()) {
             entry.setValue(OutValuesOriginal.get((index+1)%26));
+            //change the reverted map as well:
+            RotorWiringReverse.put(entry.getValue(), entry.getKey());
             index++;
         }
         RotationCount++;

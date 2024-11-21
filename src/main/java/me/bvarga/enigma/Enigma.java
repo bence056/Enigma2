@@ -1,40 +1,45 @@
 package me.bvarga.enigma;
 
-import me.bvarga.enigma.components.ReflectorBase;
+import me.bvarga.enigma.components.Plugboard;
+import me.bvarga.enigma.components.Reflector;
 import me.bvarga.enigma.components.RotorBase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Enigma {
 
-    private List<RotorBase> rotors;
-    private ReflectorBase reflector;
+    private final Plugboard plugboard;
+    private final List<RotorBase> rotors;
 
     public Enigma(int numRotors) {
-        rotors = new ArrayList<RotorBase>();
+        rotors = new ArrayList<>();
         for (int i = 0; i < numRotors; i++) {
             RotorBase rotor = new RotorBase();
+            if(rotors.size() >= 1) {
+                rotors.get(rotors.size()-1).SetNextRotor(rotor);
+            }
             rotors.add(rotor);
         }
-        if(presetReflector != null) {
-            reflector = presetReflector;
-        }else {
-            reflector = new ReflectorBase();
-        }
+        //set default plugboard.
+        plugboard = new Plugboard();
     }
 
-    public Enigma(ReflectorBase presetReflector, RotorBase... Rotors) {
-        rotors = new ArrayList<RotorBase>();
+    public Enigma(RotorBase... Rotors) {
+        rotors = new ArrayList<>();
         rotors.addAll(Arrays.asList(Rotors));
-        if(presetReflector != null) {
-            reflector = presetReflector;
-        }else {
-            reflector = new ReflectorBase();
-        }
+        plugboard = new Plugboard();
+    }
 
+    public Enigma(EnigmaConfig Conf) {
+        rotors = new ArrayList<>();
+        for(RotorBase rotorBase : Conf.SavedRotors) {
+            if(!rotors.isEmpty() && rotors.get(rotors.size() - 1) != null) {
+                rotors.get(rotors.size() - 1).SetNextRotor(rotorBase);
+            }
+            rotors.add(rotorBase);
+        }
+        plugboard = new Plugboard();
+        plugboard.CopyConnections(Conf.SavedPlugboard);
     }
 
     public String processString(String input) {
@@ -55,13 +60,16 @@ public class Enigma {
 
         int asNumber = c - 'A';
 
+        //first feed through plugboard.
+        asNumber = plugboard.GetConnectedValue(asNumber);
+
         for(RotorBase rotor : rotors) {
 
             asNumber = rotor.convertForward(asNumber);
 
         }
 
-        asNumber = reflector.convertForward(asNumber);
+        asNumber = Reflector.convert(asNumber);
 
         for(int i=rotors.size()-1; i>=0; i--) {
             RotorBase rotor = rotors.get(i);
@@ -69,7 +77,22 @@ public class Enigma {
 
         }
 
+        //now advance the first rotor as one character entered.
+        if(rotors.get(0) != null) {
+            rotors.get(0).AdvanceRotor();
+        }
+
+        //feed through the plugboard again.
+        asNumber = plugboard.GetConnectedValue(asNumber);
+
         return (char)('A' + asNumber);
+    }
+
+    public EnigmaConfig ParseConfig() {
+        EnigmaConfig Config = new EnigmaConfig();
+        Config.SavedRotors.addAll(rotors);
+
+        return Config;
     }
 
 }
