@@ -78,8 +78,24 @@ public class RotorBase implements Serializable {
 
     }
 
+    public void SetRotorPosition(int numPosition) {
+
+        int numAdvance = (numPosition - RotationCount + 26);
+        List<Integer> OutValuesOriginal = RotorWiring.values().stream().toList();
+        int index = 0;
+        for(Map.Entry<Integer, Integer> entry : RotorWiring.entrySet()) {
+            entry.setValue(OutValuesOriginal.get((index+numAdvance)%26));
+            //change the reverted map as well:
+            RotorWiringReverse.put(entry.getValue(), entry.getKey());
+            index++;
+        }
+        RotationCount = numPosition % 26;
+    }
+
     public void SetNextRotor(RotorBase NextRotor) {
         this.NextRotor = NextRotor;
     }
+
+    public int GetCurrentRotorIndex() {return RotationCount;}
 
 }

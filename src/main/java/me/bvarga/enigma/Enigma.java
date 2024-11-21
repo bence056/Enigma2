@@ -95,4 +95,6 @@ public class Enigma {
         return Config;
     }
 
+    public List<RotorBase> GetRotors() {return rotors;}
+
 }
