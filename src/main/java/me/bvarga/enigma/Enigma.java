@@ -83,7 +83,7 @@ public class Enigma {
         }
 
         //feed through the plugboard again.
-        asNumber = plugboard.GetConnectedValue(asNumber);
+        asNumber = plugboard.GetReverseConnectedValue(asNumber);
 
         return (char)('A' + asNumber);
     }
@@ -91,10 +91,10 @@ public class Enigma {
     public EnigmaConfig ParseConfig() {
         EnigmaConfig Config = new EnigmaConfig();
         Config.SavedRotors.addAll(rotors);
-
+        Config.SavedPlugboard = plugboard;
         return Config;
     }
 
     public List<RotorBase> GetRotors() {return rotors;}
-
+    public Plugboard GetPlugboard() {return plugboard;}
 }

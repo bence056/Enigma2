@@ -23,6 +23,7 @@ public class EnigmaController {
                 File f = new File("./data.enigma");
                 if(f.createNewFile()) {
                     machine = new Enigma(3);
+                    machine.GetPlugboard().ConnectLetters(5,9);
                     FileOutputStream fos = new FileOutputStream("./data.enigma");
                     ObjectOutputStream oos = new ObjectOutputStream(fos);
                     oos.writeObject(machine.ParseConfig());
@@ -67,4 +68,36 @@ public class EnigmaController {
         view.UpdateUI(machine);
 
     }
+
+    public Enigma getMachine() {
+        return machine;
+    }
+
+
+    public void TriggerModifyPlugboardConfig() {
+
+        int Letter1 = view.PlugboardLeft.getSelectedIndex();
+        int Letter2 = view.PlugboardRight.getSelectedIndex();
+
+        if(Letter1 != Letter2) {
+            //check if they are connected:
+            boolean bDontReconnect = false;
+            if(machine.GetPlugboard().GetConnectedLetterCodes().contains(Letter1)) {
+                //disconnect it.
+                bDontReconnect |= Letter2 == machine.GetPlugboard().DisconnectLetter(Letter1);
+
+            }
+            if(machine.GetPlugboard().GetConnectedLetterCodes().contains(Letter2)) {
+                //disconnect it.
+                bDontReconnect |= Letter1 == machine.GetPlugboard().DisconnectLetter(Letter2);
+
+            }
+
+            if(!bDontReconnect) {
+                //we know they were not paired up, so we create a new pairing with the given values.
+                machine.GetPlugboard().ConnectLetters(Letter1, Letter2);
+            }
+            }
+        machine.GetPlugboard().fireTableDataChanged();
+        }
 }
