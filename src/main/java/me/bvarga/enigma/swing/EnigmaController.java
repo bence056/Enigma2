@@ -4,9 +4,13 @@ import me.bvarga.enigma.Enigma;
 import me.bvarga.enigma.EnigmaConfig;
 import me.bvarga.enigma.components.Reflector;
 import me.bvarga.enigma.components.RotorBase;
+import me.bvarga.enigma.network.InstanceRole;
+import me.bvarga.enigma.network.NetworkManager;
 
 import javax.swing.*;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,13 +19,14 @@ public class EnigmaController {
 
     private Enigma machine;
     private EnigmaView view;
+    private NetworkManager networkManager;
 
     private char lastEncodedCharacter = '?';
     private String encodedString = "";
 
     public void InitializeController() {
         Reflector.InitializeReflector();
-
+        networkManager = new NetworkManager(this);
         RandomizeNewMachine();
         view = new EnigmaView(this);
         view.UpdateUI(machine);
@@ -141,6 +146,66 @@ public class EnigmaController {
             LetterCodes.remove(selIndex2);
             machine.GetPlugboard().ConnectLetters(selValue, selValue2);
         }
+    }
+
+    public void TriggerMessageReceived(String msg) {
+        view.ChatOutput.append(msg + "\n");
+        view.UpdateUI(machine);
+    }
+
+    public void TriggerSendMessage(String msg) {
+        //add to local log as well.
+        try {
+            TriggerMessageReceived(String.format("[%s] %s", InetAddress.getLocalHost().getHostName(), msg));
+        } catch (UnknownHostException e) {
+            System.out.println("Error, local hostname cannot be determined");
+        }
+        networkManager.SendMessage(msg);
+        view.UpdateUI(machine);
+    }
+
+    public boolean IsNetConnected() {
+        return networkManager.bIsConnected();
+    }
+
+    public InstanceRole GetInstanceRole() {
+        return networkManager.getInstanceRole();
+    }
+
+    public void TriggerDisconnect() {
+        if(IsNetConnected()) {
+            networkManager.DisconnectSocket();
+        }
+        view.ChatOutput.setText("");
+    }
+
+    public void TriggerConnect() {
+        if(!IsNetConnected()) {
+            try {
+                int ServerPort = Integer.parseInt(view.ServerPortField.getText());
+                String ServerAddr = view.ServerAddressField.getText();
+                if(ServerAddr.isEmpty()) ServerAddr = "127.0.0.1";
+                networkManager.InitializeClient(ServerAddr, ServerPort);
+            }catch (NumberFormatException ex) {
+                TriggerSendMessage("Server port is not a number");
+            }
+        }
+    }
+
+
+    public void TriggerHostServer() {
+        if(!IsNetConnected()) {
+            try {
+                int ServerPort = Integer.parseInt(view.ServerPortField.getText());
+                networkManager.InitializeServer(ServerPort);
+            }catch (NumberFormatException ex) {
+                TriggerSendMessage("Server port is not a number");
+            }
+        }
+    }
+
+    public void TriggerDisconnectConfirmed() {
+        view.UpdateUI(machine);
     }
 
 }

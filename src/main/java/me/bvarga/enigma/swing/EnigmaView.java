@@ -3,6 +3,7 @@ package me.bvarga.enigma.swing;
 import me.bvarga.enigma.Enigma;
 import me.bvarga.enigma.components.Plugboard;
 import me.bvarga.enigma.components.RotorBase;
+import me.bvarga.enigma.network.InstanceRole;
 import org.w3c.dom.Text;
 
 import javax.crypto.Mac;
@@ -31,6 +32,12 @@ public class EnigmaView extends JFrame {
     JButton PlugboardButton;
     JTable PlugboardTable;
     JButton EncodeButton;
+    JTextArea ChatOutput;
+
+    JTextField ServerAddressField;
+    JTextField ServerPortField;
+    JButton ChatConnectButton;
+    JButton ChatHostButton;
 
     private InputMode TextInputMode = InputMode.SingleChar;
 
@@ -101,7 +108,8 @@ public class EnigmaView extends JFrame {
 
         JButton SendButton = new JButton("Send");
         SendButton.addActionListener(e -> {
-            //todo later.
+            Controller.TriggerSendMessage(outputText.getText());
+            outputText.setText("");
         });
 
         JButton SaveConfigButton = new JButton("Save");
@@ -160,6 +168,63 @@ public class EnigmaView extends JFrame {
 
 
         EnigmaPanel ChatPanel = new EnigmaPanel("Chat");
+        ChatPanel.setLayout(new GridLayout(2, 1));
+        JPanel ChatTextPanel = new JPanel();
+        ChatTextPanel.setLayout(new BorderLayout());
+        JPanel ChatControlPanel = new JPanel();
+        ChatControlPanel.setLayout(new GridLayout(2, 1));
+
+        JLabel MessageLabel = new JLabel("Message:");
+        JTextField MessageInput = new JTextField(18);
+        JButton SendMessageButton = new JButton("Send");
+        SendMessageButton.addActionListener(e -> {
+            Controller.TriggerSendMessage(MessageInput.getText());
+        });
+
+        JPanel ChatSenderPanel = new JPanel();
+        ChatSenderPanel.setLayout(new FlowLayout());
+        ChatSenderPanel.add(MessageLabel);
+        ChatSenderPanel.add(MessageInput);
+        ChatSenderPanel.add(SendMessageButton);
+
+        JPanel ChatConfigPanel = new JPanel();
+        ChatConfigPanel.setLayout(new FlowLayout());
+
+        JLabel IpLabel = new JLabel("IP:");
+        ServerAddressField = new JTextField(12);
+        JLabel PortLabel = new JLabel(":");
+        ServerPortField = new JTextField(3);
+        ChatConnectButton = new JButton("Join");
+        ChatConnectButton.addActionListener(e -> {
+            if (Controller.IsNetConnected()) {
+                Controller.TriggerDisconnect();
+            } else {
+                Controller.TriggerConnect();
+            }
+        });
+        ChatHostButton = new JButton("Host");
+        ChatHostButton.addActionListener(e -> {
+            Controller.TriggerHostServer();
+        });
+
+        ChatConfigPanel.add(IpLabel);
+        ChatConfigPanel.add(ServerAddressField);
+        ChatConfigPanel.add(PortLabel);
+        ChatConfigPanel.add(ServerPortField);
+        ChatConfigPanel.add(ChatConnectButton);
+        ChatConfigPanel.add(ChatHostButton);
+
+        ChatControlPanel.add(ChatSenderPanel);
+        ChatControlPanel.add(ChatConfigPanel);
+
+
+        ChatOutput = new JTextArea();
+        ChatOutput.setEditable(false);
+        JScrollPane ChatOutputScrollPane = new JScrollPane(ChatOutput);
+        ChatOutputScrollPane.setAutoscrolls(true);
+        ChatTextPanel.add(ChatOutputScrollPane, BorderLayout.CENTER);
+        ChatPanel.add(ChatTextPanel);
+        ChatPanel.add(ChatControlPanel);
 
 
         this.add(RotorsPanel);
@@ -172,7 +237,6 @@ public class EnigmaView extends JFrame {
         FirstRotor.addActionListener(listener);
         SecondRotor.addActionListener(listener);
         ThirdRotor.addActionListener(listener);
-//        PlugboardConnected.addActionListener(modifiedEvent);
 
     }
 
@@ -196,6 +260,12 @@ public class EnigmaView extends JFrame {
 
         PlugboardTable.setModel(Controller.getMachine().GetPlugboard());
         Controller.getMachine().GetPlugboard().fireTableDataChanged();
+
+        ChatConnectButton.setText(Controller.IsNetConnected() ? (Controller.GetInstanceRole() == InstanceRole.Server ? "Terminate" : "Disconnect") : "Connect");
+        ChatHostButton.setVisible(!Controller.IsNetConnected());
+        ServerAddressField.setVisible(!Controller.IsNetConnected());
+        ServerPortField.setVisible(!Controller.IsNetConnected());
+
 
     }
 

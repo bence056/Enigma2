@@ -1,14 +1,12 @@
 package me.bvarga.enigma;
 
-import me.bvarga.enigma.components.Reflector;
+import me.bvarga.enigma.network.NetworkManager;
 import me.bvarga.enigma.swing.EnigmaController;
-
-import java.io.*;
 
 public class Main {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         EnigmaController controller = new EnigmaController();
         controller.InitializeController();
