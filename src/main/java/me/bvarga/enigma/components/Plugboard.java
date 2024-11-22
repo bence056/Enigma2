@@ -13,52 +13,44 @@ import java.util.List;
 public class Plugboard extends AbstractTableModel implements Serializable {
 
     protected Map<Integer, Integer> PlugboardValues;
-    protected Map<Integer, Integer> PlugboardValuesReverse;
     protected List<Integer> ConnectedKeys;
 
     public Plugboard() {
         PlugboardValues = new HashMap<Integer, Integer>();
-        PlugboardValuesReverse = new HashMap<Integer, Integer>();
         ConnectedKeys = new ArrayList<>();
         for(int i=0; i<26; i++) {
             PlugboardValues.put(i, i);
-            PlugboardValuesReverse.put(i, i);
         }
     }
 
     public void ConnectLetters(Integer left, Integer right) {
         //check if the selected letters are not connected to anything.
-        if(PlugboardValues.get(left).intValue() == left.intValue()) {
+        if(!GetConnectedLetterCodes().contains(left) && !GetConnectedLetterCodes().contains(right)) {
             //set the connection pair.
             PlugboardValues.put(left, right);
-            PlugboardValuesReverse.put(right, left);
+            PlugboardValues.put(right, left);
             ConnectedKeys.add(left);
         }
     }
 
     public int DisconnectLetter(Integer any) {
 
-        int PVKey = -1;
-        int PVRKey = -1;
+        int Key1 = -1;
+        int Key2 = -1;
 
         if(ConnectedKeys.contains(any)) {
             //we know that the given letter is the left one;
-            PVKey = any;
-            PVRKey = PlugboardValues.get(any);
-        }else {
-            //we know that the given letter is the right one;
-            PVKey = PlugboardValuesReverse.get(any);
-            PVRKey = any;
+            Key1 = any;
+            Key2 = PlugboardValues.get(any);
         }
 
-        int pairValue = PlugboardValues.get(PVKey);
 
-        PlugboardValues.put(PVKey, PVKey);
-        PlugboardValuesReverse.put(PVRKey, PVRKey);
+        PlugboardValues.put(Key1, Key1);
+        PlugboardValues.put(Key2, Key2);
 
         int indexToRemove = -1;
         for(int i=0; i<ConnectedKeys.size(); i++) {
-            if(ConnectedKeys.get(i).intValue() == PVKey) {
+            if(ConnectedKeys.get(i) == Key1) {
                 indexToRemove = i;
                 break;
             }
@@ -66,20 +58,15 @@ public class Plugboard extends AbstractTableModel implements Serializable {
         if(indexToRemove != -1) {
             ConnectedKeys.remove(indexToRemove);
         }
-        return pairValue;
+        return Key2;
     }
 
     public int GetConnectedValue(Integer inData) {
         return PlugboardValues.get(inData);
     }
 
-    public int GetReverseConnectedValue(Integer inData) {
-        return PlugboardValuesReverse.get(inData);
-    }
-
     public void CopyConnections(Plugboard pb) {
         PlugboardValues = pb.PlugboardValues;
-        PlugboardValuesReverse = pb.PlugboardValuesReverse;
         ConnectedKeys = pb.ConnectedKeys;
     }
 

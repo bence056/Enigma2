@@ -83,7 +83,7 @@ public class Enigma {
         }
 
         //feed through the plugboard again.
-        asNumber = plugboard.GetReverseConnectedValue(asNumber);
+        asNumber = plugboard.GetConnectedValue(asNumber);
 
         return (char)('A' + asNumber);
     }
