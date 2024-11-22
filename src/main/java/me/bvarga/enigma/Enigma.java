@@ -58,7 +58,7 @@ public class Enigma {
 
     public char ProcessSingle(char c) {
 
-        int asNumber = c - 'A';
+        int asNumber = Character.toUpperCase(c) - 'A';
 
         //first feed through plugboard.
         asNumber = plugboard.GetConnectedValue(asNumber);

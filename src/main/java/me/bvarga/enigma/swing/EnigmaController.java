@@ -100,4 +100,9 @@ public class EnigmaController {
             }
         machine.GetPlugboard().fireTableDataChanged();
         }
+
+    public void TriggerToggleInputMode(boolean bUseTextField) {
+        view.SetInputMode(bUseTextField ? InputMode.TextField : InputMode.SingleChar);
+        view.UpdateUI(machine);
+    }
 }

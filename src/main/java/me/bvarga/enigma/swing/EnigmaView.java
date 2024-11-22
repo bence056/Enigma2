@@ -3,6 +3,7 @@ package me.bvarga.enigma.swing;
 import me.bvarga.enigma.Enigma;
 import me.bvarga.enigma.components.Plugboard;
 import me.bvarga.enigma.components.RotorBase;
+import org.w3c.dom.Text;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -11,6 +12,8 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +26,12 @@ public class EnigmaView extends JFrame {
     JComboBox<Character> PlugboardLeft = new JComboBox<>();
     JComboBox<Character> PlugboardRight = new JComboBox<>();
     JComboBox<Character> LetterSelector = new JComboBox<>();
+    JTextField MessageInput = new JTextField();
     JButton PlugboardButton;
     JTable PlugboardTable;
+    JButton EncodeButton;
+
+    private InputMode TextInputMode = InputMode.SingleChar;
 
     JLabel EncodeResultLabel;
     JTextField outputText;
@@ -52,7 +59,7 @@ public class EnigmaView extends JFrame {
 
         EnigmaPanel EncodePanel = new EnigmaPanel("Encode");
         EncodePanel.setLayout(new BorderLayout());
-        JButton EncodeButton = new JButton("Encode!");
+        EncodeButton = new JButton("Encode!");
         EncodeButton.addActionListener(e -> {
             Controller.TriggerEncode((Character)LetterSelector.getSelectedItem());
         });
@@ -64,7 +71,19 @@ public class EnigmaView extends JFrame {
         JPanel EncodeTopPanel = new JPanel();
         EncodeTopPanel.setLayout(new FlowLayout());
 
+        JCheckBox TextFieldMode = new JCheckBox("Prefer Text field");
+        TextFieldMode.addActionListener(e -> {
+            Controller.TriggerToggleInputMode(TextFieldMode.isSelected());
+        });
+        EncodeTopPanel.add(TextFieldMode);
         EncodeTopPanel.add(LetterSelector);
+        MessageInput.addKeyListener(new MessageInputAdapter());
+        MessageInput.setColumns(1);
+        EncodeTopPanel.add(MessageInput);
+        LetterSelector.setVisible(TextInputMode == InputMode.SingleChar);
+        MessageInput.setVisible(TextInputMode == InputMode.TextField);
+        EncodeButton.setVisible(TextInputMode == InputMode.SingleChar);
+
         EncodeTopPanel.add(EncodeButton);
         EncodeTopPanel.add(EncodeResultLabel);
 
@@ -144,6 +163,10 @@ public class EnigmaView extends JFrame {
 
     }
 
+    public void SetInputMode(InputMode InputMode) {
+        this.TextInputMode = InputMode;
+    }
+
 
     public void UpdateUI(Enigma enigma) {
         List<RotorBase> rotorBaseList = enigma.GetRotors();
@@ -154,46 +177,22 @@ public class EnigmaView extends JFrame {
         EncodeResultLabel.setText(String.valueOf(Controller.getLastEncodedCharacter()));
         outputText.setText(Controller.getEncodedString());
 
+        LetterSelector.setVisible(TextInputMode == InputMode.SingleChar);
+        MessageInput.setVisible(TextInputMode == InputMode.TextField);
+        EncodeButton.setVisible(TextInputMode == InputMode.SingleChar);
 
     }
 
-//    class PlugboardEntryModifiedListener implements ActionListener {
-//
-//        public void actionPerformed(ActionEvent ae) {
-//            if(ae.getSource() == PlugboardLeft) {
-//                Plugboard PBRef = Controller.getMachine().GetPlugboard();
-//                List<Integer> DisallowedLetters = PBRef.GetConnectedLetterCodes();
-//                if(DisallowedLetters.contains(PlugboardLeft.getSelectedIndex())) {
-//                    PlugboardRight.removeAllItems();
-//                    for(int i=0; i<26; i++) {
-//                        PlugboardRight.addItem((char)('A' + i));
-//                    }
-//
-//                    int pairIndex = Controller.getMachine().GetPlugboard().GetConnectedValue(PlugboardLeft.getSelectedIndex());
-//                    if(pairIndex == PlugboardLeft.getSelectedIndex()) {
-//                        pairIndex = Controller.getMachine().GetPlugboard().GetReverseConnectedValue(PlugboardLeft.getSelectedIndex());
-//                    }
-//                    PlugboardRight.setSelectedIndex(pairIndex);
-//                    PlugboardRight.setEnabled(false);
-//                }else {
-//                    PlugboardRight.removeAllItems();
-//                    for(int i=0; i<26; i++) {
-//                        if(!DisallowedLetters.contains(i) && i != PlugboardLeft.getSelectedIndex()) {
-//                            PlugboardRight.addItem((char)('A' + i));
-//                        }
-//                    }
-//                    PlugboardRight.setEnabled(true);
-//                }
-//
-//            }else if(ae.getSource() == PlugboardButton) {
-//                if(bConnect) {
-//
-//                }else {
-//
-//                }
-//            }
-//        }
-//    }
+    private class MessageInputAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if(Character.isAlphabetic(e.getKeyChar())) {
+                Controller.TriggerEncode(e.getKeyChar());
+            }
+            MessageInput.setText("");
+        }
+    }
 
     class RotorsModifiedListener implements ActionListener {
 
