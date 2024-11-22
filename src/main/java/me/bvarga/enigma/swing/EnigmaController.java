@@ -7,6 +7,9 @@ import me.bvarga.enigma.components.RotorBase;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class EnigmaController {
 
@@ -19,25 +22,7 @@ public class EnigmaController {
     public void InitializeController() {
         Reflector.InitializeReflector();
 
-            try {
-                File f = new File("./data.enigma");
-                if(f.createNewFile()) {
-                    machine = new Enigma(3);
-                    machine.GetPlugboard().ConnectLetters(5,9);
-                    FileOutputStream fos = new FileOutputStream("./data.enigma");
-                    ObjectOutputStream oos = new ObjectOutputStream(fos);
-                    oos.writeObject(machine.ParseConfig());
-                }else {
-                    FileInputStream fis = new FileInputStream(f);
-                    ObjectInputStream ois = new ObjectInputStream(fis);
-                    EnigmaConfig ec = (EnigmaConfig) ois.readObject();
-                    if(ec != null) {
-                        machine = new Enigma(ec);
-                    }
-                }
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
+        RandomizeNewMachine();
         view = new EnigmaView(this);
         view.UpdateUI(machine);
         view.setVisible(true);
@@ -105,4 +90,57 @@ public class EnigmaController {
         view.SetInputMode(bUseTextField ? InputMode.TextField : InputMode.SingleChar);
         view.UpdateUI(machine);
     }
+
+    public void TriggerSaveMachineConfig() {
+        try {
+            File f = new File("./data.enigma");
+            if(!f.exists()) f.createNewFile();
+            FileOutputStream fos = new FileOutputStream("./data.enigma");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(machine.ParseConfig());
+            oos.close();
+            view.UpdateUI(machine);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void TriggerLoadMachineConfig() {
+        try {
+            File f = new File("./data.enigma");
+            if(f.exists()) {
+                FileInputStream fis = new FileInputStream(f);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                EnigmaConfig ec = (EnigmaConfig) ois.readObject();
+                if(ec != null) {
+                    machine = new Enigma(ec);
+                }
+                ois.close();
+            }else {
+                RandomizeNewMachine();
+            }
+            view.UpdateUI(machine);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void RandomizeNewMachine() {
+        machine = new Enigma(3);
+        List<Integer> LetterCodes = new ArrayList<Integer>();
+        Random r = new Random();
+        for(int i=0; i<26; i++) {
+            LetterCodes.add(i);
+        }
+        for(int i=0; i<5; i++) {
+            int selIndex = r.nextInt(LetterCodes.size());
+            int selValue = LetterCodes.get(selIndex);
+            LetterCodes.remove(selIndex);
+            int selIndex2 = r.nextInt(LetterCodes.size());
+            int selValue2 = LetterCodes.get(selIndex2);
+            LetterCodes.remove(selIndex2);
+            machine.GetPlugboard().ConnectLetters(selValue, selValue2);
+        }
+    }
+
 }

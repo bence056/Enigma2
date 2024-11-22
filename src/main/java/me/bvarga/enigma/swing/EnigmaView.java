@@ -5,6 +5,7 @@ import me.bvarga.enigma.components.Plugboard;
 import me.bvarga.enigma.components.RotorBase;
 import org.w3c.dom.Text;
 
+import javax.crypto.Mac;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -103,6 +104,18 @@ public class EnigmaView extends JFrame {
             //todo later.
         });
 
+        JButton SaveConfigButton = new JButton("Save");
+        SaveConfigButton.addActionListener(e -> {
+            Controller.TriggerSaveMachineConfig();
+        });
+
+        JButton LoadConfigButton = new JButton("Load");
+        LoadConfigButton.addActionListener(e -> {
+            Controller.TriggerLoadMachineConfig();
+        });
+
+        EncodeBottomPanel.add(SaveConfigButton);
+        EncodeBottomPanel.add(LoadConfigButton);
         EncodeBottomPanel.add(outputText);
         EncodeBottomPanel.add(ClearButton);
         EncodeBottomPanel.add(SendButton);
@@ -180,6 +193,9 @@ public class EnigmaView extends JFrame {
         LetterSelector.setVisible(TextInputMode == InputMode.SingleChar);
         MessageInput.setVisible(TextInputMode == InputMode.TextField);
         EncodeButton.setVisible(TextInputMode == InputMode.SingleChar);
+
+        PlugboardTable.setModel(Controller.getMachine().GetPlugboard());
+        Controller.getMachine().GetPlugboard().fireTableDataChanged();
 
     }
 

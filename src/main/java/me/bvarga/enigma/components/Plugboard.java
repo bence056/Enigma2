@@ -127,4 +127,12 @@ public class Plugboard extends AbstractTableModel implements Serializable {
         return returnList;
     }
 
+    @Override
+    public String getColumnName(int column) {
+        return switch (column) {
+            case 0 -> "Letter #1";
+            case 1 -> "Letter #2";
+            default -> "";
+        };
+    }
 }
