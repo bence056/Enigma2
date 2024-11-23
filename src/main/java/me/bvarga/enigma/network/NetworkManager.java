@@ -39,13 +39,13 @@ public class NetworkManager {
                     controller.TriggerMessageReceived("Connected!");
                     String msg;
                     while ((msg = ChatRead.readLine()) != null) {
-                        controller.TriggerMessageReceived(String.format("[%s]: %s", InetAddress.getLocalHost().getHostName(), msg));
+                        controller.TriggerMessageReceived(msg);
                     }
 
                 } catch (UnknownHostException e) {
                     controller.TriggerMessageReceived("Host does not exist or can not be reached.");
-                } catch (IOException ignored) {
-
+                } catch (IOException e) {
+                    controller.TriggerMessageReceived("An Error Occurred.");
                 }
             }
         }).start();
@@ -61,16 +61,16 @@ public class NetworkManager {
                     serverSocket = new ServerSocket(port);
                     instanceRole = InstanceRole.Server;
                     controller.TriggerMessageReceived(String.format("[%s]: Server started. - Waiting for connection...", InetAddress.getLocalHost().getHostName()));
-                    while (clientSocket == null) {
-                        clientSocket = serverSocket.accept();
-                    }
+
+                    clientSocket = serverSocket.accept();
+
                     controller.TriggerMessageReceived(String.format("[%s]: Client connected.", InetAddress.getLocalHost().getHostName()));
                     ChatWrite = new PrintWriter(clientSocket.getOutputStream(), true);
                     ChatRead = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
                     String msg;
-                    while ((msg = ChatRead.readLine()) != null) {
-                        controller.TriggerMessageReceived(String.format("[%s]: %s", InetAddress.getLocalHost().getHostName(), msg));
+                    while (!clientSocket.isClosed() && (msg = ChatRead.readLine()) != null) {
+                        controller.TriggerMessageReceived(msg);
                     }
 
                 } catch (IOException e) {

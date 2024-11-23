@@ -157,10 +157,10 @@ public class EnigmaController {
         //add to local log as well.
         try {
             TriggerMessageReceived(String.format("[%s] %s", InetAddress.getLocalHost().getHostName(), msg));
+            networkManager.SendMessage(String.format("[%s] %s", InetAddress.getLocalHost().getHostName(), msg));
         } catch (UnknownHostException e) {
             System.out.println("Error, local hostname cannot be determined");
         }
-        networkManager.SendMessage(msg);
         view.UpdateUI(machine);
     }
 
