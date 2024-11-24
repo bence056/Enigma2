@@ -1,9 +1,13 @@
 package me.bvarga.enigma.components;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
 public class RotorBase implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 20241123L;
 
     protected Map<Integer, Integer> RotorWiring;
     protected Map<Integer, Integer> RotorWiringReverse;
