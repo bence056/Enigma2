@@ -53,6 +53,7 @@ public class Plugboard extends AbstractTableModel {
             PlugboardValues.put(left, right);
             PlugboardValues.put(right, left);
             ConnectedKeys.add(left);
+            ConnectedKeys.add(right);
         }
     }
 
@@ -73,16 +74,26 @@ public class Plugboard extends AbstractTableModel {
         PlugboardValues.put(Key1, Key1);
         PlugboardValues.put(Key2, Key2);
 
-        int indexToRemove = -1;
+        int index1ToRemove = -1;
+        int index2ToRemove = -1;
         for(int i=0; i<ConnectedKeys.size(); i++) {
             if(ConnectedKeys.get(i) == Key1) {
-                indexToRemove = i;
-                break;
+                index1ToRemove = i;
             }
         }
-        if(indexToRemove != -1) {
-            ConnectedKeys.remove(indexToRemove);
+        if(index1ToRemove != -1) {
+            ConnectedKeys.remove(index1ToRemove);
         }
+        for(int i=0; i<ConnectedKeys.size(); i++) {
+            if(ConnectedKeys.get(i) == Key2) {
+                index2ToRemove = i;
+            }
+        }
+        if(index2ToRemove != -1) {
+            ConnectedKeys.remove(index2ToRemove);
+        }
+
+
         return Key2;
     }
 
@@ -120,7 +131,7 @@ public class Plugboard extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return ConnectedKeys.size();
+        return  (int) Math.floor((double)ConnectedKeys.size()/(double) 2);
     }
 
     @Override
@@ -130,8 +141,18 @@ public class Plugboard extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int i, int i1) {
-        int left = ConnectedKeys.get(i);
-        int right = PlugboardValues.get(left);
+        List<Integer> AlreadyAdded = new ArrayList<>();
+        Map<Integer, Integer> DistinctMap = new HashMap<>();
+        for(int j=0; j<26; j++) {
+            if(PlugboardValues.get(j) != j && !AlreadyAdded.contains(j) && !AlreadyAdded.contains(PlugboardValues.get(j))) {
+                DistinctMap.put(j, PlugboardValues.get(j));
+                AlreadyAdded.add(j);
+                AlreadyAdded.add(PlugboardValues.get(j));
+            }
+        }
+        List<Integer> MapKeys = new ArrayList<>(DistinctMap.keySet());
+        int left = MapKeys.get(i);
+        int right = DistinctMap.get(left);
         switch (i1) {
             case 0: return (char) (left + 'A');
             case 1: return (char) (right + 'A');
@@ -156,11 +177,7 @@ public class Plugboard extends AbstractTableModel {
      * @return list of the connected letter codes.
      */
     public List<Integer> GetConnectedLetterCodes() {
-        List<Integer> returnList = new ArrayList<>(ConnectedKeys);
-        for(Integer key : ConnectedKeys) {
-            returnList.add(PlugboardValues.get(key));
-        }
-        return returnList;
+        return ConnectedKeys;
     }
 
     @Override
