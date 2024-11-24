@@ -1,5 +1,7 @@
 package me.bvarga.enigma.components;
 
+import me.bvarga.enigma.EnigmaConfig;
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -94,13 +96,13 @@ public class Plugboard extends AbstractTableModel {
     }
 
     /**
-     * Helper function to copy data from another plugboard.
+     * Helper function to copy data from the config
      * It is mainly used when the states are loaded in from EnigmaConfig
-     * @param pb The plugboard object to copy from.
+     * @param conf The config object to copy from.
      */
-    public void CopyConnections(Plugboard pb) {
-        PlugboardValues = pb.PlugboardValues;
-        ConnectedKeys = pb.ConnectedKeys;
+    public void CopyConnections(EnigmaConfig conf) {
+        PlugboardValues = conf.PlugboardEntries;
+        ConnectedKeys = conf.PlugboardKeys;
     }
 
     /**
@@ -108,6 +110,12 @@ public class Plugboard extends AbstractTableModel {
      * @return ConnectedKeys
      */
     public List<Integer> GetConnectedKeys() {return ConnectedKeys;}
+
+    /**
+     * Getter for the PlugboardValues array.
+     * @return PlugboardValues
+     */
+    public Map<Integer, Integer> GetPlugboardValues() {return PlugboardValues;}
 
 
     @Override

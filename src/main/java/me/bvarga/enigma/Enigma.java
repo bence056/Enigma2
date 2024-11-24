@@ -61,7 +61,7 @@ public class Enigma {
             rotors.add(rotorBase);
         }
         plugboard = new Plugboard();
-        plugboard.CopyConnections(Conf.SavedPlugboard);
+        plugboard.CopyConnections(Conf);
     }
 
     /**
@@ -127,7 +127,8 @@ public class Enigma {
     public EnigmaConfig ParseConfig() {
         EnigmaConfig Config = new EnigmaConfig();
         Config.SavedRotors.addAll(rotors);
-        Config.SavedPlugboard = plugboard;
+        Config.PlugboardEntries = plugboard.GetPlugboardValues();
+        Config.PlugboardKeys = plugboard.GetConnectedKeys();
         return Config;
     }
 
