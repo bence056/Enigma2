@@ -25,28 +25,85 @@ import java.util.List;
  */
 public class EnigmaView extends JFrame {
 
+    /**
+     * Dropdown for the first rotor setting.
+     */
     JComboBox<Character> FirstRotor = new JComboBox<>();
+    /**
+     * Dropdown for the second rotor setting.
+     */
     JComboBox<Character> SecondRotor = new JComboBox<>();
+    /**
+     * Dropdown for the third rotor setting.
+     */
     JComboBox<Character> ThirdRotor = new JComboBox<>();
+    /**
+     * Dropdown for the plugboard config - left side
+     */
     JComboBox<Character> PlugboardLeft = new JComboBox<>();
+    /**
+     * Dropdown for the plugboard config - right side
+     */
     JComboBox<Character> PlugboardRight = new JComboBox<>();
+    /**
+     * Dropdown for the input letter selector.
+     */
     JComboBox<Character> LetterSelector = new JComboBox<>();
+    /**
+     * Text field for the input text.
+     */
     JTextField MessageInput = new JTextField();
+    /**
+     * Button for connect/disconnect on plugboard.
+     */
     JButton PlugboardButton;
+    /**
+     * Table containing the plugboard's current state.
+     */
     JTable PlugboardTable;
+    /**
+     * Button for sending the single letter for encoding
+     */
     JButton EncodeButton;
+    /**
+     * Text area for the chat.
+     */
     JTextArea ChatOutput;
 
+    /**
+     * Text field for the server's address.
+     */
     JTextField ServerAddressField;
+    /**
+     * Text field for the server's port
+     */
     JTextField ServerPortField;
+    /**
+     * Button for initiating connection / termination.
+     */
     JButton ChatConnectButton;
+    /**
+     * Button for hosting server.
+     */
     JButton ChatHostButton;
 
+    /**
+     * Variable storing the selected input type.
+     */
     private InputMode TextInputMode = InputMode.SingleChar;
 
+    /**
+     * Label for returning the encoded data.
+     */
     JLabel EncodeResultLabel;
+    /**
+     * Text field, not editable, contains the full encoded string.
+     */
     JTextField outputText;
 
+    /**
+     * Controller reference for the MVC framework.
+     */
     public EnigmaController Controller;
 
     /**

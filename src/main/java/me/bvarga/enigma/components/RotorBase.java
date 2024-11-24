@@ -4,6 +4,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Engima rotor base class.
+ */
 public class RotorBase implements Serializable {
 
 
@@ -24,6 +27,9 @@ public class RotorBase implements Serializable {
      * The connected rotor.
      */
     private RotorBase NextRotor = null;
+    /**
+     * Included randomizer object for rand gen.
+     */
     protected Random rand = new Random();
 
     /**

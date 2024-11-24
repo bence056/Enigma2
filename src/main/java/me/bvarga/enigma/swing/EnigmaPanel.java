@@ -9,6 +9,10 @@ import java.awt.*;
  */
 public class EnigmaPanel extends JPanel {
 
+    /**
+     * Custom JPanel constructor.
+     * @param PanelTitle the title to use on the top of the panel.
+     */
     public EnigmaPanel(String PanelTitle) {
         TitledBorder b = BorderFactory.createTitledBorder(PanelTitle);
         b.setTitleJustification(TitledBorder.CENTER);

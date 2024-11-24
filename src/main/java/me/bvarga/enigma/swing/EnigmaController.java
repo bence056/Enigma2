@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * MVC Controller class
+ */
 public class EnigmaController {
 
     /**
