@@ -24,9 +24,12 @@ public class EnigmaConfig implements Serializable {
     List<RotorBase> SavedRotors = new ArrayList<>();
 
     /**
-     * The saved plugboard config.
+     * The saved plugboard pair entry.
      */
     public Map<Integer, Integer> PlugboardEntries = new HashMap<>();
+    /**
+     * The saved plugboard key list.
+     */
     public List<Integer> PlugboardKeys = new ArrayList<>();
 
 }
