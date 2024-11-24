@@ -17,8 +17,6 @@ import java.util.List;
  */
 public class Plugboard extends AbstractTableModel {
 
-    @Serial
-    private static final long serialVersionUID = 20241123L;
 
     /**
      * The mapping of the plugboard pairs.

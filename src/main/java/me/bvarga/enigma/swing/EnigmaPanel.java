@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
+/**
+ * Custom JPanel, allows for the creation of the segmented titled UI elements.
+ */
 public class EnigmaPanel extends JPanel {
 
     public EnigmaPanel(String PanelTitle) {

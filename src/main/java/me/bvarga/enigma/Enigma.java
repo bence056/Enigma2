@@ -6,16 +6,29 @@ import me.bvarga.enigma.components.RotorBase;
 
 import java.util.*;
 
+/**
+ * The enigma machine class.
+ */
 public class Enigma {
 
+    /**
+     * Stored plugboard config.
+     */
     private final Plugboard plugboard;
+    /**
+     * Stored rotor config.
+     */
     private final List<RotorBase> rotors;
 
+    /**
+     * Base constructor. It creates an enigma machine with 3 rotors. Currently, it is limited to 3, but it could be expanded in the future.
+     * @param numRotors number of rotors to use.
+     */
     public Enigma(int numRotors) {
         rotors = new ArrayList<>();
         for (int i = 0; i < numRotors; i++) {
             RotorBase rotor = new RotorBase();
-            if(rotors.size() >= 1) {
+            if(!rotors.isEmpty()) {
                 rotors.get(rotors.size()-1).SetNextRotor(rotor);
             }
             rotors.add(rotor);
@@ -24,12 +37,21 @@ public class Enigma {
         plugboard = new Plugboard();
     }
 
+    /**
+     * Custom constructor for an unspecified size of array, rotors as input.
+     * @param Rotors The given rotors to use.
+     */
     public Enigma(RotorBase... Rotors) {
         rotors = new ArrayList<>();
         rotors.addAll(Arrays.asList(Rotors));
         plugboard = new Plugboard();
     }
 
+    /**
+     * Custom constructor with a config parameter to allow for loading from a file data.
+     * @param Conf The custom config.
+     * @see EnigmaConfig
+     */
     public Enigma(EnigmaConfig Conf) {
         rotors = new ArrayList<>();
         for(RotorBase rotorBase : Conf.SavedRotors) {
@@ -42,6 +64,11 @@ public class Enigma {
         plugboard.CopyConnections(Conf.SavedPlugboard);
     }
 
+    /**
+     * String processor, allows whole strings to be processed with the machine.
+     * @param input The string to process.
+     * @return The encoded string.
+     */
     public String processString(String input) {
         input = input.toUpperCase();
         String ReturnString = "";
@@ -56,6 +83,11 @@ public class Enigma {
         return ReturnString;
     }
 
+    /**
+     * Character processor for the encoder.
+     * @param c The character to process.
+     * @return The encoded character.
+     */
     public char ProcessSingle(char c) {
 
         int asNumber = Character.toUpperCase(c) - 'A';
@@ -88,6 +120,10 @@ public class Enigma {
         return (char)('A' + asNumber);
     }
 
+    /**
+     * Config parser for file writing.
+     * @return The parsed config of the machine's current state.
+     */
     public EnigmaConfig ParseConfig() {
         EnigmaConfig Config = new EnigmaConfig();
         Config.SavedRotors.addAll(rotors);
@@ -95,6 +131,15 @@ public class Enigma {
         return Config;
     }
 
+    /**
+     * Getter for rotors.
+     * @return The assigned rotors.
+     */
     public List<RotorBase> GetRotors() {return rotors;}
+
+    /**
+     * Getter for plugboard.
+     * @return The assigned plugboard.
+     */
     public Plugboard GetPlugboard() {return plugboard;}
 }

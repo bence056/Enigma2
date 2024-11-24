@@ -20,6 +20,9 @@ import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main view control. Generates and propagates the user interface.
+ */
 public class EnigmaView extends JFrame {
 
     JComboBox<Character> FirstRotor = new JComboBox<>();
@@ -46,6 +49,11 @@ public class EnigmaView extends JFrame {
 
     public EnigmaController Controller;
 
+    /**
+     * Constructor for the UI.
+     *
+     * @param Controller Reference to the controller from the MVC framework.
+     */
     public EnigmaView(EnigmaController Controller) {
 
         this.Controller = Controller;
@@ -56,20 +64,20 @@ public class EnigmaView extends JFrame {
         setLayout(new GridLayout(2, 2));
         setResizable(false);
 
-        for(int i=0; i<26; i++) {
-            FirstRotor.addItem((char)('A' + i));
-            SecondRotor.addItem((char)('A' + i));
-            ThirdRotor.addItem((char)('A' + i));
-            PlugboardLeft.addItem((char)('A' + i));
-            PlugboardRight.addItem((char)('A' + i));
-            LetterSelector.addItem((char)('A' + i));
+        for (int i = 0; i < 26; i++) {
+            FirstRotor.addItem((char) ('A' + i));
+            SecondRotor.addItem((char) ('A' + i));
+            ThirdRotor.addItem((char) ('A' + i));
+            PlugboardLeft.addItem((char) ('A' + i));
+            PlugboardRight.addItem((char) ('A' + i));
+            LetterSelector.addItem((char) ('A' + i));
         }
 
         EnigmaPanel EncodePanel = new EnigmaPanel("Encode");
         EncodePanel.setLayout(new BorderLayout());
         EncodeButton = new JButton("Encode!");
         EncodeButton.addActionListener(e -> {
-            Controller.TriggerEncode((Character)LetterSelector.getSelectedItem());
+            Controller.TriggerEncode((Character) LetterSelector.getSelectedItem());
         });
         EncodeResultLabel = new JLabel("?");
 
@@ -148,7 +156,6 @@ public class EnigmaView extends JFrame {
         JScrollPane PlugboardTableScrollPane = new JScrollPane(PlugboardTable);
 
         PlugboardTable.setModel(Controller.getMachine().GetPlugboard());
-        PlugboardTable.setDefaultRenderer(JButton.class, new JTableButtonRenderer(PlugboardTable.getDefaultRenderer(JButton.class)));
 
 
         PlugboardPanel.add(PlugboardTableScrollPane, BorderLayout.CENTER);
@@ -163,8 +170,6 @@ public class EnigmaView extends JFrame {
         });
         PlugboardManagement.add(PlugboardButton);
         PlugboardPanel.add(PlugboardManagement, BorderLayout.SOUTH);
-
-
 
 
         EnigmaPanel ChatPanel = new EnigmaPanel("Chat");
@@ -240,11 +245,19 @@ public class EnigmaView extends JFrame {
 
     }
 
+    /**
+     * Setter for the text input mode.
+     * @param InputMode Whether to use dropdown or text field.
+     */
     public void SetInputMode(InputMode InputMode) {
         this.TextInputMode = InputMode;
     }
 
 
+    /**
+     * This method updates the UI and refreshes propagated data from the model's dataset.
+     * @param enigma The enigma machine to get the data from.
+     */
     public void UpdateUI(Enigma enigma) {
         List<RotorBase> rotorBaseList = enigma.GetRotors();
         FirstRotor.setSelectedIndex(rotorBaseList.get(0).GetCurrentRotorIndex());
@@ -269,41 +282,34 @@ public class EnigmaView extends JFrame {
 
     }
 
+    /**
+     * Inherited KeyAdapter for the custom text input field.
+     */
     private class MessageInputAdapter extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            if(Character.isAlphabetic(e.getKeyChar())) {
+            if (Character.isAlphabetic(e.getKeyChar())) {
                 Controller.TriggerEncode(e.getKeyChar());
             }
             MessageInput.setText("");
         }
     }
 
+    /**
+     * Custom action listener for the rotor modification.
+     */
     class RotorsModifiedListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            if(ae.getSource().equals(FirstRotor)) {
+            if (ae.getSource().equals(FirstRotor)) {
                 Controller.TriggerModifyRotorConfig(0, FirstRotor.getSelectedIndex());
-            }else if(ae.getSource().equals(SecondRotor)) {
+            } else if (ae.getSource().equals(SecondRotor)) {
                 Controller.TriggerModifyRotorConfig(1, SecondRotor.getSelectedIndex());
-            }else if(ae.getSource().equals(ThirdRotor)) {
+            } else if (ae.getSource().equals(ThirdRotor)) {
                 Controller.TriggerModifyRotorConfig(2, ThirdRotor.getSelectedIndex());
             }
-        }
-    }
-
-
-    class JTableButtonRenderer implements TableCellRenderer {
-        private final TableCellRenderer defaultRenderer;
-        public JTableButtonRenderer(TableCellRenderer renderer) {
-            defaultRenderer = renderer;
-        }
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if(value instanceof Component)
-                return (Component)value;
-            return defaultRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
     }
 
